@@ -1,6 +1,6 @@
 
 import uuid, hashlib, sqlite3
-import myprecious.Constants as c
+import myprecious.constants as c
 
 def hash(password: str):
     salt = uuid.uuid4().hex

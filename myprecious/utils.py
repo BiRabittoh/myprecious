@@ -1,5 +1,5 @@
-from myprecious.Encoding import obj_encode
-import myprecious.Constants as c
+from myprecious.encoding import obj_encode
+import myprecious.constants as c
 
 def handle_platform(game, platform):
     try:

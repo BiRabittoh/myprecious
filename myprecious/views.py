@@ -1,17 +1,15 @@
 from myprecious import app, login_manager
 from flask import request, redirect, render_template
 from flask_login import login_user, logout_user, current_user
-from werkzeug.utils import secure_filename
-from contextlib import suppress
-import myprecious.Constants as c
-from myprecious.Utils import handle_response, parse_remember
-from myprecious.Auth import handle_register, handle_login, get_logged_user
-from myprecious.Encoding import obj_decode
-import os
-if c.DEBUG_SWITCH:
-    from myprecious.GamesApiTest import search_game
+import myprecious.constants as c
+from myprecious.utils import handle_response, parse_remember
+from myprecious.auth import handle_register, handle_login, get_logged_user
+from myprecious.files import handle_upload
+from myprecious.encoding import obj_decode
+if app.debug:
+    from myprecious.games_api_test import search_game
 else:
-    from myprecious.GamesApi import search_game
+    from myprecious.games_api import search_game
 
 def render(template, **context):
     return render_template(template, user=current_user, **context)
@@ -50,7 +48,7 @@ def route_register():
         return render("register.html")
     error = handle_register(request.form)
     if error is None:
-        return render("register_done.html")
+        return render("done.html", text="Your registration request has been taken into account and will likely be processed in a few days.")
     return render("register.html", error=error)
     
 @app.route('/logout')
@@ -66,7 +64,8 @@ def route_search():
         return render("search.html")
     query = request.form["query"]
     search_response = search_game(query)
-    return render("search.html", games=handle_response(search_response), query=query)
+    games = handle_response(search_response)
+    return render("search.html", games=games, query=query)
 
 @app.route('/upload', methods=['GET', 'POST'])
 def route_upload():
@@ -76,27 +75,12 @@ def route_upload():
         info = request.args.get("info")
         if info is None:
             return render("upload.html", game=c.NO_GAME)
-        game = obj_decode(info)
-        return render("upload.html", game=game)
-        
-    f = request.files['file']
-    try:
-        game_id = int(request.form['game_id'])
-        platform_id = int(request.form['platform_id'])
-    except ValueError:
-        return redirect("/upload")
+        return render("upload.html", game=obj_decode(info))
     
-    # TODO: use IGDB api to validate game_id, platform_id and title before adding
-    # TODO: save game in DB
-
-    save_folder = os.path.join(c.BASE_DIRECTORY, c.CONTENT_DIRECTORY, str(current_user.id), str(game_id), str(platform_id))
-    with suppress(FileExistsError):
-        os.makedirs(save_folder)
-    if f.filename is None:
-        return redirect("/upload")
-    save_file = os.path.join(save_folder, secure_filename(f.filename))
-    f.save(save_file)
-    return render("index.html")
+    error = handle_upload(request, current_user.id)
+    if error is None:
+        return render("done.html", text="Your save file was uploaded correctly.")
+    return render("input.html", error=error)
 
 
 @app.route('/admin', methods=['GET', 'POST'])

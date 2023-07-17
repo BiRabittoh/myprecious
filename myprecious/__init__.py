@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_login import LoginManager
-import myprecious.Constants as c
-from myprecious.Db import init_db
+import myprecious.constants as c
+from myprecious.db import init_db
 
 app = Flask(__name__)
 login_manager = LoginManager(app)

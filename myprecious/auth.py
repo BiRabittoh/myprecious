@@ -1,5 +1,5 @@
-import myprecious.Constants as c
-from myprecious.Db import add_user_to_queue, get_user_from_username, get_user_from_id
+import myprecious.constants as c
+from myprecious.db import add_user_to_queue, get_user_from_username, get_user_from_id
 from flask_login import UserMixin
 
 class User(UserMixin):

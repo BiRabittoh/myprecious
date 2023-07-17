@@ -1,7 +1,7 @@
 from igdb.wrapper import IGDBWrapper
 from urllib.parse import urlencode
 from contextlib import suppress
-import Constants as c
+import myprecious.constants as c
 import requests
 import os, json
 

@@ -23,4 +23,7 @@
     {% endif %}
     <input type="submit" value="submit save" {% if not game.platform %}disabled{% endif %}/>
 </form>
+{% if error %}
+<p class="error">{{ error }}</p>
+{% endif %}
 {% endblock %}
