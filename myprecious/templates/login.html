@@ -8,4 +8,7 @@
     <label for="remember">remember me</label><br />
     <input type="submit" value="login" />
 </form>
+{% if error %}
+<p class="error">{{ error }}</p>
+{% endif %}
 {% endblock %}
