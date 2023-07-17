@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}search{% endblock %}
+{% block content %}
+<form action="/search" method="POST" enctype="multipart/form-data">
+    <input type="text" name="query" placeholder="Game" {% if query %}value="{{ query }}" {% endif %}required />
+    <input type="submit" value="search" />
+</form>
+<table>
+{% for game in games %}
+<tr onClick="send(this)" data-info="{{ game.info }}">
+    <td>
+        <img src="{{ game.cover }}" style="height: 100px;">
+    </td>
+    <td>
+        <i>{{ game.title }}</i> on <i>{{ game.platform }}</i>
+    </td>
+</tr>
+{% endfor %}
+</table>
+<script>
+    function send(element) {
+        const params_str = new URLSearchParams({ "info": element.getAttribute("data-info") });
+        window.location.href = "/upload?" + params_str;
+    }
+</script>
+{% endblock %}

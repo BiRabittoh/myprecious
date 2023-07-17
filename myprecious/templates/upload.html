@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}upload{% endblock %}
+{% block content %}
+<form action="/upload" method="POST" enctype="multipart/form-data">
+    <input type="text" name="game_id" value="{{ game.game_id }}" required />
+    <input type="text" name="platform_id" value="{{ game.platform_id }}" required />
+    <table>
+        <tr onClick="window.location.href = '/search';">
+            <td>
+                <img src="{{ game.cover }}" style="height: 100px;">
+            </td>
+            <td>
+                <i>{{ game.title }}</i>
+                {% if game.platform %}
+                    on <i>{{ game.platform }}</i>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+    {% if game.platform %}
+    Now pick your save:
+    <input type="file" name="file" required />
+    {% endif %}
+    <input type="submit" value="submit save" {% if not game.platform %}disabled{% endif %}/>
+</form>
+{% endblock %}

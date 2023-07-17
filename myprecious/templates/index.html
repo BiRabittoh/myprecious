@@ -1,46 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>myprecious</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <style></style>
-</head>
-
-<body>
-
-    <header>
-        <nav>
-            <a href="#">Home</a>
-            <a href="#">Upload</a>
-            <a href="#">Login</a>
-            <a href="#">Register</a>
-        </nav>
-    </header>
-
-    <main>
-        <h1>MyPrecious</h1>
-        <p></p>
-        <p>A simple game saves library.</p>
-        <p></p>
-
-        <form action="/uploader" method="POST" enctype="multipart/form-data">
-            <input type="file" name="file" />
-            <input type="text" name="game_id" placeholder="Game ID" />
-            <input type="submit" />
-        </form>
-
-        <nav>
-            <span>questions: </span>
-            <a href="#">what is this</a>
-            <a href="https://birabittoh.github.io/">who made this</a>
-        </nav>
-
-    </main>
-
-
-</body>
-
-</html>
+{% extends "base.html" %}
+{% block title %}myprecious{% endblock %}
+{% block content %}
+<p>A simple library for game saves.</p>
+<p></p>
+{% endblock %}

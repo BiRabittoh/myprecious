@@ -12,7 +12,7 @@ textarea {
     width: 100%;
 }
 
-form > *:not(label, [type=submit]) {
+form > *:not(label, [type=submit], [type=checkbox]) {
     width: 100%;
     display: block;
     box-sizing: border-box;

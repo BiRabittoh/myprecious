@@ -11,6 +11,10 @@ flask = "^2.3.2"
 flask-sqlalchemy = "^3.0.5"
 flask-login = "^0.6.2"
 werkzeug = "^2.3.6"
+wtforms = "^3.0.1"
+flask-wtf = "^1.1.1"
+igdb-api-v4 = "^0.2.0"
+python-dotenv = "^1.0.0"
 
 
 [build-system]
