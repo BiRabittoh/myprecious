@@ -2,8 +2,8 @@ from flask import Flask, request, render_template, url_for, redirect
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user
 from werkzeug.utils import secure_filename
 from contextlib import suppress
-import os, json, base64, sqlite3
-import hashlib, uuid
+from Db import init_db, get_user_from_username, get_user_from_id, add_user_to_queue
+import os, json, base64
 import Constants as c
 if c.DEBUG_SWITCH:
     from GamesApiTest import search_game
@@ -12,36 +12,6 @@ else:
 
 app = Flask(__name__)
 login_manager = LoginManager(app)
-
-def hash(password: str):
-    salt = uuid.uuid4().hex
-    return hashlib.sha512(password + salt).hexdigest(), salt
-
-def db_query_one(query, parameters):
-    with sqlite3.connect(c.DB_PATH) as db_connection:
-        curs = db_connection.cursor()
-        curs.execute(query, parameters)
-        try:
-            return list(curs.fetchone())
-        except TypeError:
-            return None
-        
-def run_sql(sql_path: str):
-    with open(sql_path, 'r', encoding="utf-8") as f:
-        with sqlite3.connect(c.DB_PATH) as con:
-            curs = con.cursor()
-            sql = f.read()
-            curs.executescript(sql)
-
-def add_user(username, password, email):
-    query_str = "insert or ignore into login (username, password, email) values (?,?,?);"
-    query_param = [username, password, email]
-    return db_query_one(query_str, query_param)
-
-def init_db():
-    run_sql(c.MIGRATIONS_INIT_PATH)
-    add_user(c.DEFAULT_ADMIN_USER, c.DEFAULT_ADMIN_PW, c.DEFAULT_ADMIN_EMAIL)
-
 
 class User(UserMixin):
     def __init__(self, user_id, username, password, email):
@@ -77,15 +47,15 @@ def handle_platform(game, platform):
     temp_obj["info"] = temp_base64.decode("utf-8")
     return temp_obj
 
-def handle_game(game):
-    return [ handle_platform(game, platform) for platform in game["platforms"] ]
+def handle_response(response):
+    return [ [ handle_platform(game, platform) for platform in game["platforms"] ] for game in response ]
 
 def collapse_list_of_lists(l):
     return [ item for sublist in l for item in sublist ]
 
 @login_manager.user_loader
 def load_user(user_id):
-    lu = db_query_one("SELECT * from login where user_id = (?)", [user_id])
+    lu = get_user_from_id(user_id)
     if lu is None:
         return None
     return construct_user(lu[0], lu[1], lu[2], lu[3])
@@ -110,7 +80,7 @@ def route_login():
     except KeyError:
         remember = False
 
-    r = db_query_one("SELECT * FROM login where username = (?)", [username])
+    r = get_user_from_username(username)
     if r is None:
         return render_template("login.html", user=current_user, last_user=username)
     user = construct_user(r[0], r[1], r[2], r[3])
@@ -132,7 +102,21 @@ def route_register():
     if request.method == "GET":
         return render("register.html")
     
-    return render("register.html")
+    form = request.form
+    username = form["username"].lower()
+    email = form["email"].lower()
+    password = form["password"]
+
+    if len(password) < c.MIN_PW_LENGTH or len(username) < c.MIN_USERNAME_LENGTH:
+        return render_template("register.html", user=current_user, error="Your username or password is too short.")
+    
+    if len(password) > c.MAX_LENGTH or len(username) > c.MAX_LENGTH:
+        return render_template("register.html", user=current_user, error="Your username or password is too long.")
+    
+    res = add_user_to_queue(username, password, email)
+    if res == None:
+        return render_template("register.html", user=current_user, error="This username is already registered.")
+    return render("register_done.html")
 
 @app.route('/logout')
 def route_logout():
@@ -149,7 +133,7 @@ def route_search():
     query = request.form["query"]
     search_response = search_game(query)
     
-    games = collapse_list_of_lists([ handle_game(x) for x in search_response ])
+    games = collapse_list_of_lists(handle_response(search_response))
     return render_template("search.html", user=current_user, games=games, query=query)
 
 @app.route('/upload', methods=['GET', 'POST'])

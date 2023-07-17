@@ -16,6 +16,9 @@ DEFAULT_ADMIN_PW = os.getenv("DEFAULT_ADMIN_PW", "admin")
 DEFAULT_ADMIN_EMAIL = os.getenv("DEFAULT_ADMIN_EMAIL", "")
 
 # other constants
+MIN_PW_LENGTH = 5
+MIN_USERNAME_LENGTH = 3
+MAX_LENGTH = 20
 MISSING_COVER_URL = "https://placehold.co/100?text=no%20cover"
 BASE_DIRECTORY = "data"
 CONTENT_DIRECTORY = "content"

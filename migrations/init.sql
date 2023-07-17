@@ -4,3 +4,9 @@ create table if not exists login (
     password text not null,
     email text
 );
+
+create table if not exists queue (
+    username text primary key,
+    password text not null,
+    email text
+)

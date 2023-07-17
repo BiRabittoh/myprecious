@@ -8,4 +8,7 @@ to be implemented...
     <input type="password" name="password" placeholder="password" />
     <input type="submit" value="register" />
 </form>
+{% if error %}
+<p class="error">{{ error }}</p>
+{% endif %}
 {% endblock %}
