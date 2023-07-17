@@ -41,3 +41,7 @@ footer {
 .link::before {
     content: "â†— ";
 }
+
+.hidden {
+    display: none !important;
+}

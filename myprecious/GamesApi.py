@@ -6,6 +6,9 @@ import requests
 import os, json
 
 def get_token():
+    if None in [ c.CLIENT_ID, c.CLIENT_SECRET ]:
+        print("Please check your .env file.")
+        exit(1)
     url = f"{ c.AUTH_URL }?{ urlencode(c.AUTH_URL_PARAMS) }"
     response = requests.request("POST", url).json()
     return response['access_token']

@@ -2,8 +2,8 @@
 {% block title %}upload{% endblock %}
 {% block content %}
 <form action="/upload" method="POST" enctype="multipart/form-data">
-    <input type="text" name="game_id" value="{{ game.game_id }}" required />
-    <input type="text" name="platform_id" value="{{ game.platform_id }}" required />
+    <input class="hidden" type="text" name="game_id" value="{{ game.game_id }}" required />
+    <input class="hidden" type="text" name="platform_id" value="{{ game.platform_id }}" required />
     <table>
         <tr onClick="window.location.href = '/search';">
             <td>

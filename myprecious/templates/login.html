@@ -2,10 +2,10 @@
 {% block title %}login{% endblock %}
 {% block content %}
 <form action="/login" method="POST" enctype="multipart/form-data">
-    <input type="text" name="username" placeholder="User" {% if last_user %}value="{{ last_user }}" {% endif %}/>
-    <input type="password" name="password" placeholder="Password" />
+    <input type="text" name="username" placeholder="username" {% if last_user %}value="{{ last_user }}" {% endif %}/>
+    <input type="password" name="password" placeholder="password" />
     <input type="checkbox" name="remember" checked>
-    <label for="remember">Remember me</label><br />
+    <label for="remember">remember me</label><br />
     <input type="submit" value="login" />
 </form>
 {% endblock %}

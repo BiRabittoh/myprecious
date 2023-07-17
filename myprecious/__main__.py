@@ -59,7 +59,6 @@ def construct_user(id, username, password, email):
 def render(template):
     return render_template(template, user=current_user)
 
-
 def handle_platform(game, platform):
     try:
         game_cover = "https:" + game["cover"]["url"]
@@ -125,6 +124,16 @@ def route_login():
     else:
         return render_template("login.html", user=current_user, last_user=username)
 
+@app.route('/register', methods=['GET', 'POST'])
+def route_register():
+    if current_user.is_authenticated:
+        return redirect('/')
+    
+    if request.method == "GET":
+        return render("register.html")
+    
+    return render("register.html")
+
 @app.route('/logout')
 def route_logout():
     logout_user()
@@ -176,6 +185,24 @@ def route_upload():
     save_file = os.path.join(save_folder, secure_filename(f.filename))
     f.save(save_file)
     return render("index.html")
+
+
+@app.route('/admin', methods=['GET', 'POST'])
+def route_admin():
+    if not current_user.is_authenticated:
+        return redirect('/')
+    
+    if current_user.id != 1:
+        return redirect('/')
+    
+    if request.method == "GET":
+        return render("admin.html")
+    
+    return render("admin.html")
+
+@app.route('/about')
+def route_about():
+    return render("about.html")
 
 if __name__ == "__main__":
     app.debug=c.DEBUG_SWITCH
