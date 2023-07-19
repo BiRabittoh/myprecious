@@ -49,3 +49,16 @@ footer {
 .error {
     color: lightcoral;
 }
+
+.t-row {
+    height: 50px;
+}
+
+.t-row > td {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.t-center {
+    text-align: center;
+}

@@ -8,5 +8,6 @@ create table if not exists login (
 create table if not exists queue (
     username text primary key,
     password text not null,
-    email text
+    email text,
+    requested datetime DEFAULT CURRENT_TIMESTAMP
 )

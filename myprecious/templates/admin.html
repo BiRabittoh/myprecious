@@ -1,8 +1,35 @@
 {% extends "base.html" %}
 {% block title %}admin{% endblock %}
 {% block content %}
-to be implemented...
-<form action="/admin" method="POST" enctype="multipart/form-data">
-    <input type="submit" value="save" />
-</form>
+    <h2>queue</h2>
+    <table>
+        <thead>
+            <tr class="t-row">
+                <td>Requested</td>
+                <td>Username</td>
+                <td>E-Mail</td>
+                <td>Actions</td>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entry in queue %}
+            <tr class="t-row">
+                <td>{{ entry[3] }}</td>
+                <td>{{ entry[0] }}</td>
+                <td>{% if entry[2] %}{{ entry[2] }}{% else %}&#8212;{% endif %}</td>
+                <td class="t-center" data-username="{{ entry[0] }}">
+                    <input type="button" onclick="allow_or_deny(this)" value="allow" />&nbsp;
+                    <input type="button" onclick="allow_or_deny(this, false)" value="deny" />
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+<script>
+    function allow_or_deny(button, allow=true) {
+        const username = button.parentElement.getAttribute("data-username");
+        action = allow ? "allow" : "deny";
+        window.location.href="/admin/" + action + "/" + username;
+    }
+</script>
 {% endblock %}

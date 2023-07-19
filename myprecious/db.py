@@ -39,15 +39,23 @@ def add_user(username, password, email):
     query_param = [username, password, email]
     return db_query(query_str, query_param)
 
-def accept_user(username):
-    r = get_user_from_username(username, "queue")
-    return add_user(r[0], r[1], r[2])
-
 def get_user_from_username(username: str, table="login"):
-    return db_query_one(f"SELECT * FROM { table } where username = (?)", [username])
+    return db_query_one(f"SELECT * FROM { table } where username = (?);", [username])
 
 def get_user_from_id(id: int):
-    return db_query_one("SELECT * from login where user_id = (?)", [id])
+    return db_query_one("SELECT * from login where user_id = (?);", [id])
+
+def get_queued_users():
+    res = db_query("SELECT * from queue;", [])
+    return res.fetchall()
+
+def deny_user(nick):
+    return db_query_one("DELETE FROM queue WHERE username = (?)", [nick])
+
+def allow_user(nick):
+    r = get_user_from_username(nick, "queue")
+    r = add_user(r[0], r[1], r[2])
+    return deny_user(nick)
 
 def init_db():
     run_sql(c.MIGRATIONS_INIT_PATH)

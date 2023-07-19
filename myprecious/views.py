@@ -4,6 +4,7 @@ from flask_login import login_user, logout_user, current_user
 import myprecious.constants as c
 from myprecious.utils import handle_response, parse_remember
 from myprecious.auth import handle_register, handle_login, get_logged_user
+from myprecious.db import get_queued_users, allow_user, deny_user
 from myprecious.files import handle_upload
 from myprecious.encoding import obj_decode
 if app.debug:
@@ -87,14 +88,34 @@ def route_upload():
 def route_admin():
     if not current_user.is_authenticated:
         return redirect('/')
-    
     if current_user.id != 1:
         return redirect('/')
     
     if request.method == "GET":
-        return render("admin.html")
-    
+        queue = get_queued_users()
+        return render("admin.html", queue=queue)
     return render("admin.html")
+
+@app.route('/admin/allow/<username>')
+def route_admin_allow(username):
+    if not current_user.is_authenticated:
+        return redirect('/')
+    if current_user.id != 1:
+        return redirect('/')
+    
+    allow_user(username)
+    return redirect("/admin")
+
+@app.route('/admin/deny/<username>')
+def route_admin_deny(username):
+    if not current_user.is_authenticated:
+        return redirect('/')
+    if current_user.id != 1:
+        return redirect('/')
+    
+    deny_user(username)
+    return redirect("/admin")
+    
 
 @app.route('/about')
 def route_about():
