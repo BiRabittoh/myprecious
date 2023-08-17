@@ -1,0 +1,13 @@
+services:
+  app:
+    build: .
+    image: myprecious:latest
+    container_name: myprecious
+    ports:
+      - 127.0.0.1:1111:80
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - data:/app/data
+      - ${PWD}/.env:/app/.env
+volumes:
+  data:

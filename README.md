@@ -2,15 +2,25 @@
 
 ## Configuration
 ```
-poetry install --with prod
+cp .env.example .env
+nano .env
 ```
 
-## Usage
+### Docker
 ```
-poetry run waitress-serve --port 1111 myprecious:app
+docker-compose up -d
 ```
 
 ### Debug
 ```
+poetry install
 poetry run flask --app myprecious run --port 1111 --debug
 ```
+
+
+## Production
+```
+poetry install --with prod
+poetry run waitress-serve --port 1111 myprecious:app
+```
+
