@@ -14,9 +14,9 @@
         <tbody>
         {% for entry in queue %}
             <tr class="t-row">
-                <td>{{ entry[3] }}</td>
+                <td>{{ entry[4] }}</td>
                 <td>{{ entry[0] }}</td>
-                <td>{% if entry[2] %}{{ entry[2] }}{% else %}&#8212;{% endif %}</td>
+                <td>{% if entry[3] %}{{ entry[3] }}{% else %}&#8212;{% endif %}</td>
                 <td class="t-center" data-username="{{ entry[0] }}">
                     <input type="button" onclick="allow_or_deny(this)" value="allow" />&nbsp;
                     <input type="button" onclick="allow_or_deny(this, false)" value="deny" />

@@ -2,12 +2,12 @@
 
 ## Configuration
 ```
-poetry install
+poetry install --with prod
 ```
 
 ## Usage
 ```
-poetry run waitress-serve myprecious:app
+poetry run waitress-serve --port 1111 myprecious:app
 ```
 
 ### Debug

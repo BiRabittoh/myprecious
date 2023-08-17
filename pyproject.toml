@@ -15,8 +15,13 @@ wtforms = "^3.0.1"
 flask-wtf = "^1.1.1"
 igdb-api-v4 = "^0.2.0"
 python-dotenv = "^1.0.0"
-waitress = "^2.1.2"
+argon2-cffi = "^23.1.0"
 
+[tool.poetry.group.prod]
+optional = true
+
+[tool.poetry.group.prod.dependencies]
+waitress = "^2.1.2"
 
 [build-system]
 requires = ["poetry-core"]

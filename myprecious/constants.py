@@ -14,6 +14,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", str(uuid.uuid4()))
 DEFAULT_ADMIN_USER = os.getenv("DEFAULT_ADMIN_USER", "admin")
 DEFAULT_ADMIN_PW = os.getenv("DEFAULT_ADMIN_PW", "admin")
 DEFAULT_ADMIN_EMAIL = os.getenv("DEFAULT_ADMIN_EMAIL", "")
+PEPPER = os.getenv("PEPPER", "")
 
 # other constants
 MIN_PW_LENGTH = 5
@@ -38,7 +39,7 @@ TOKEN_FILENAME = "igdb.txt"
 TOKEN_PATH = os.path.join(BASE_DIRECTORY, TOKEN_FILENAME)
 AUTH_URL = "https://id.twitch.tv/oauth2/token"
 AUTH_URL_PARAMS = {
-        "client_id": CLIENT_ID,
-        "client_secret": CLIENT_SECRET,
-        "grant_type": "client_credentials"
+    "client_id": CLIENT_ID,
+    "client_secret": CLIENT_SECRET,
+    "grant_type": "client_credentials"
 }

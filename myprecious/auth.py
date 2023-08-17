@@ -1,17 +1,18 @@
 import myprecious.constants as c
-from myprecious.db import add_user_to_queue, get_user_from_username, get_user_from_id
+from myprecious.db import add_user_to_queue, get_user_from_username, get_user_from_id, verify_user
 from flask_login import UserMixin
 
 class User(UserMixin):
-    def __init__(self, user_id, username, password, email):
+    def __init__(self, user_id, username, password, salt, email):
         self.id = user_id
         self.username = username
         self.password = password
+        self.salt = salt
         self.email = email
 
-def construct_user(id, username, password, email):
+def construct_user(row):
     try:
-        return User(int(id), username, password, email)
+        return User(int(row[0]), row[1], row[2], row[3], row[4])
     except TypeError:
         return None
 
@@ -27,8 +28,16 @@ def handle_register(form):
         return "Your username or password is too long."
     
     res = add_user_to_queue(username, password, email)
-    if res == None:
-        return "This username is already registered."
+    match res:
+        case "registered":
+            return "This user is already registered."
+        case "queued":
+            return "This user is waiting for approval."
+        case "done":
+            return "Done! Your request was submitted and will hopefully be approved shortly."
+        case _:
+            return "An error as occurred."
+        
     return None
 
 def handle_login(form):
@@ -37,14 +46,13 @@ def handle_login(form):
     
     r = get_user_from_username(username)
     if r is None:
-        return "That account does not exist.", { "username": username }
-    user = construct_user(r[0], r[1], r[2], r[3])
+        return "This account either does not exist or it's still awaiting approval.", { "username": username }
+    user = construct_user(r)
 
     last_user = { "username": username }
     if user is None:
         return "Parsing error.", last_user
-    
-    if user.password == password:
+    if verify_user(username, user.password, password, user.salt):
         return None, user
     return "Wrong password.", last_user
 
@@ -52,4 +60,4 @@ def get_logged_user(user_id):
     lu = get_user_from_id(user_id)
     if lu is None:
         return None
-    return construct_user(lu[0], lu[1], lu[2], lu[3])
+    return construct_user(lu)

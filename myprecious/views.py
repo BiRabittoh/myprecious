@@ -37,7 +37,7 @@ def route_login():
     if error is None:
         login_user(user, remember=remember)
         return redirect("/")
-    last_user = user.username if user else None
+    last_user = user["username"] if user else None
     return render("login.html", last_user=last_user, error=error)
     
 

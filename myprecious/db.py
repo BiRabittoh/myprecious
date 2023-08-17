@@ -1,10 +1,28 @@
 
-import uuid, hashlib, sqlite3
+import os, uuid, sqlite3
+from base64 import b64encode
+from contextlib import suppress
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 import myprecious.constants as c
 
-def hash(password: str):
-    salt = uuid.uuid4().hex
-    return hashlib.sha512(password + salt).hexdigest(), salt
+ph = PasswordHasher()
+
+def get_hashable(password: str, salt: str):
+    return password + salt + c.SECRET_KEY
+
+def verify_user(username, hash, password, salt):
+    hashable = get_hashable(password, salt)
+    try:
+        ph.verify(hash, hashable)
+    except VerifyMismatchError:
+        return False
+
+    if ph.check_needs_rehash(hash):
+        new_hash = ph.hash(hashable)
+        query_str = "UPDATE login SET password = (?) WHERE username = (?);"
+        db_query(query_str, [new_hash, username])
+    return True
 
 def db_query(query, parameters):
     with sqlite3.connect(c.DB_PATH) as db_connection:
@@ -26,17 +44,21 @@ def run_sql(sql_path: str):
             sql = f.read()
             curs.executescript(sql)
 
-def add_user_to_queue(username, password, email):
-    res = get_user_from_username(username)
-    if res is not None:
-        return None
-    query_str = "insert or ignore into queue (username, password, email) values (?,?,?);"
-    query_param = [username, password, email]
-    return db_query(query_str, query_param)
+def add_user_to_queue(username, password, email, salt=None):
+    if get_user_from_username(username) is not None:
+        return "registered"
+    if get_user_from_username(username, "queue") is not None:
+        return "queued"
+    add_user(username, password, email, salt, "queue")
+    return "done"
 
-def add_user(username, password, email):
-    query_str = "insert or ignore into login (username, password, email) values (?,?,?);"
-    query_param = [username, password, email]
+def add_user(username, password, email, salt=None, table="login", hashed=False):
+    if salt is None:
+        salt = b64encode(os.urandom(12)).decode('utf-8')
+    query_str = f"insert or ignore into { table } (username, password, salt, email) values (?,?,?,?);"
+    if not hashed:
+        password = ph.hash(get_hashable(password, salt))
+    query_param = [username, password, salt, email]
     return db_query(query_str, query_param)
 
 def get_user_from_username(username: str, table="login"):
@@ -54,9 +76,11 @@ def deny_user(nick):
 
 def allow_user(nick):
     r = get_user_from_username(nick, "queue")
-    r = add_user(r[0], r[1], r[2])
+    r = add_user(r[0], r[1], r[3], r[2], hashed=True)
     return deny_user(nick)
 
 def init_db():
+    with suppress(FileExistsError):
+        os.makedirs(c.BASE_DIRECTORY)
     run_sql(c.MIGRATIONS_INIT_PATH)
     add_user(c.DEFAULT_ADMIN_USER, c.DEFAULT_ADMIN_PW, c.DEFAULT_ADMIN_EMAIL)
