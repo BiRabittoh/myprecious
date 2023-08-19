@@ -21,6 +21,8 @@ def load_user(user_id):
 
 @app.route('/')
 def route_index():
+    if current_user.is_authenticated:
+        return render("index.html", games=[])
     return render("index.html")
 
 @app.route('/login', methods=['GET', 'POST'])

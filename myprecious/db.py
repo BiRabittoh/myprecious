@@ -1,5 +1,5 @@
 
-import os, uuid, sqlite3
+import os, sqlite3
 from base64 import b64encode
 from contextlib import suppress
 from argon2 import PasswordHasher
@@ -84,3 +84,11 @@ def init_db():
         os.makedirs(c.BASE_DIRECTORY)
     run_sql(c.MIGRATIONS_INIT_PATH)
     add_user(c.DEFAULT_ADMIN_USER, c.DEFAULT_ADMIN_PW, c.DEFAULT_ADMIN_EMAIL)
+
+def add_save(game_id, game_title, platform_id, platform_name, user_id, filename):
+    db_query_one("insert or ignore into platforms (platform_id, name) values (?,?);", [platform_id, platform_name])
+    db_query_one("insert or ignore into games (game_id, title) values (?,?);", [game_id, game_title])
+    res = db_query_one("select filename from saves where user_id = (?) and game_id = (?) and platform_id = (?);", [user_id, game_id, platform_id])
+    db_query_one("delete from saves where user_id = (?) and game_id = (?) and platform_id = (?);", [user_id, game_id, platform_id])
+    db_query_one("insert or ignore into saves (user_id, game_id, platform_id, filename) values (?,?,?,?);", [user_id, game_id, platform_id, filename])
+    return res[0] if res is not None else None

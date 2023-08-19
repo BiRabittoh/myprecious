@@ -2,4 +2,17 @@
 {% block title %}myprecious{% endblock %}
 {% block content %}
 <p>A simple game saves archive.</p>
+
+<table>
+    {% for game in games %}
+    <tr onClick="" data-info="{{ game.info }}">
+        <td>
+            <img src="{{ game.cover }}" style="height: 100px;">
+        </td>
+        <td>
+            <i>{{ game.title }}</i> on <i>{{ game.platform }}</i>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
 {% endblock %}
